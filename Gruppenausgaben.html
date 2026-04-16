@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gruppenausgaben</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --border: rgba(0,0,0,0.12);
+  --border-strong: rgba(0,0,0,0.25);
+  --text: #1a1a18;
+  --text2: #6b6a64;
+  --text3: #9a9991;
+  --green: #1a7a5a;
+  --green-bg: #e8f5ee;
+  --red: #c0392b;
+  --red-bg: #fdf0ee;
+  --accent: #1a1a18;
+  --accent-text: #ffffff;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+[data-theme="dark"] {
+  --bg: #141412;
+  --surface: #1e1e1b;
+  --surface2: #272724;
+  --border: rgba(255,255,255,0.1);
+  --border-strong: rgba(255,255,255,0.22);
+  --text: #f0efe8;
+  --text2: #9a9990;
+  --text3: #5a5a54;
+  --green: #4ec99a;
+  --green-bg: #0e2a1e;
+  --red: #e07060;
+  --red-bg: #2a1410;
+  --accent: #f0efe8;
+  --accent-text: #141412;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:15px;line-height:1.5;min-height:100vh;transition:background 0.2s,color 0.2s}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1.25rem 1.5rem;border-bottom:0.5px solid var(--border);background:var(--surface)}
+.topbar-title{font-size:15px;font-weight:600;letter-spacing:-0.01em}
+.theme-toggle{background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit}
+.theme-toggle:hover{border-color:var(--border-strong);color:var(--text)}
+
+.container{max-width:640px;margin:0 auto;padding:1.5rem}
+
+.tabs{display:flex;gap:6px;margin-bottom:1.5rem;background:var(--surface2);border-radius:var(--radius);padding:4px}
+.tab{flex:1;text-align:center;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s;border:none;background:transparent;font-family:inherit}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.08),0 0 0 0.5px var(--border)}
+
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1rem}
+
+label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em}
+input,select{width:100%;padding:9px 11px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:inherit;transition:border 0.15s}
+input:focus,select:focus{outline:none;border-color:var(--border-strong)}
+input::placeholder{color:var(--text3)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.mb10{margin-bottom:10px}
+
+.btn{padding:9px 16px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.btn:hover{background:var(--surface2);border-color:var(--border-strong)}
+.btn-primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.btn-primary:hover{opacity:0.88;background:var(--accent)}
+.btn-full{width:100%}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{color:var(--red);border-color:transparent}
+.btn-danger:hover{background:var(--red-bg);border-color:transparent}
+.btn-ghost{border-color:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);border-color:transparent}
+
+.member-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.member-row input{flex:1}
+
+/* Participant checkboxes */
+.participants-box{margin-bottom:10px}
+.participants-label{font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:8px}
+.participants-list{display:flex;gap:8px;flex-wrap:wrap}
+.participant-chip{display:flex;align-items:center;gap:6px;padding:6px 11px;border:0.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);background:var(--surface2);transition:all 0.15s;user-select:none}
+.participant-chip:hover{border-color:var(--border-strong);color:var(--text)}
+.participant-chip.selected{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.participant-chip input[type=checkbox]{display:none}
+
+.expense-item{border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:8px}
+.expense-name{font-weight:600;font-size:14px}
+.expense-amount{font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.expense-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.expense-meta{font-size:12px;color:var(--text2)}
+
+.personal-box{background:var(--surface2);border-radius:var(--radius-sm);padding:11px 13px;margin-top:10px}
+.personal-box-title{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.personal-hint{font-size:12px;color:var(--text3);margin-bottom:8px;line-height:1.5}
+.pi-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.calc-hint{font-size:12px;color:var(--text2);margin-top:6px;font-variant-numeric:tabular-nums}
+.calc-hint.warn{color:var(--red)}
+
+.split-hint{font-size:12px;color:var(--text2);margin-bottom:8px}
+.split-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.split-row label{margin:0;min-width:80px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);font-weight:500}
+.split-row input{max-width:100px;flex-shrink:0}
+
+.panel{display:none}
+.panel.active{display:block}
+
+.no-data{text-align:center;color:var(--text3);font-size:13px;padding:1.5rem 0}
+
+.separator{height:0.5px;background:var(--border);margin:10px 0}
+
+.balance-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:14px}
+.balance-row:not(:last-child){border-bottom:0.5px solid var(--border)}
+.balance-amount{font-weight:600;font-variant-numeric:tabular-nums}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.zero{color:var(--text3)}
+
+.settlement-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;font-size:14px}
+.settlement-row:not(:last-child){border-bottom:0.5px solid var(--border)}
+.settlement-names{display:flex;align-items:center;gap:8px}
+.arrow{color:var(--text3);font-size:12px}
+.settlement-amount{font-weight:600;font-variant-numeric:tabular-nums}
+
+.totals-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text2);padding:8px 0 0}
+
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-neutral{background:var(--surface2);color:var(--text2)}
+
+.participants-tag{display:inline-block;background:var(--surface2);border-radius:20px;padding:1px 7px;font-size:11px;color:var(--text2);margin-top:2px}
+
+@media print {
+  .topbar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tabs, .btn, .pdf-btn-bar { display: none !important; }
+  .panel { display: block !important; }
+  .card { break-inside: avoid; }
+  body { background: white !important; }
+}
+
+.pdf-btn-bar { text-align: right; margin-bottom: 1rem; }
+.btn-pdf { background: var(--surface); border: 0.5px solid var(--border); }
+.btn-pdf:hover { background: var(--surface2); }
+
+@media(max-width:480px){
+  .grid2{grid-template-columns:1fr}
+  .pi-row{grid-template-columns:1fr 1fr auto}
+  .container{padding:1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-title">Gruppenausgaben</span>
+  <button class="theme-toggle" onclick="toggleTheme()">◑ Theme</button>
+</div>
+
+<div class="container">
+  <div class="pdf-btn-bar">
+    <button class="btn btn-pdf btn-sm" onclick="printPDF()">⬇ Als PDF speichern</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('members')">1. Personen</button>
+    <button class="tab" onclick="switchTab('expenses')">2. Ausgaben</button>
+    <button class="tab" onclick="switchTab('result')">3. Abrechnung</button>
+  </div>
+
+  <div id="panel-members" class="panel active">
+    <div class="card">
+      <div class="card-title">Wer ist dabei?</div>
+      <div id="member-list"></div>
+      <button class="btn btn-sm btn-ghost" onclick="addMember()" style="margin-top:4px">+ Person hinzufügen</button>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="switchTab('expenses')">Weiter zu Ausgaben</button>
+  </div>
+
+  <div id="panel-expenses" class="panel">
+    <div class="card">
+      <div class="card-title">Neue Ausgabe</div>
+      <div class="grid2 mb10">
+        <div><label>Beschreibung</label><input id="exp-desc" type="text" placeholder="z.B. Supermarkt"></div>
+        <div><label>Betrag (€)</label><input id="exp-total" type="number" min="0" step="0.01" placeholder="0,00" oninput="updateCalcHint()"></div>
+      </div>
+      <div class="grid2 mb10">
+        <div><label>Bezahlt von</label><select id="exp-payer"></select></div>
+        <div><label>Aufteilung</label>
+          <select id="exp-split-type" onchange="renderSplitOptions()">
+            <option value="equal">Gleich aufteilen</option>
+            <option value="custom">Benutzerdefiniert</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Participant selection -->
+      <div class="participants-box">
+        <span class="participants-label">Wer ist beteiligt?</span>
+        <div id="participant-chips" class="participants-list"></div>
+      </div>
+
+      <div id="split-options"></div>
+
+      <div class="personal-box">
+        <div class="personal-box-title">Persönliche Anteile</div>
+        <div class="personal-hint">Waren Sachen dabei, die nur für eine Person sind? Diese werden vom Gruppenanteil abgezogen und direkt dieser Person berechnet.</div>
+        <div id="personal-items"></div>
+        <button class="btn btn-sm btn-ghost" onclick="addPersonalItem()">+ Persönlichen Anteil hinzufügen</button>
+        <div id="calc-hint" class="calc-hint"></div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="addExpense()" style="margin-top:12px">Ausgabe hinzufügen</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Eingetragene Ausgaben</div>
+      <div id="expense-list"><div class="no-data">Noch keine Ausgaben.</div></div>
+      <div id="expense-totals"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="switchTab('result')">Zur Abrechnung</button>
+  </div>
+
+  <div id="panel-result" class="panel">
+    <div class="card">
+      <div class="card-title">Übersicht pro Person</div>
+      <div id="person-summary"><div class="no-data">Noch keine Ausgaben eingetragen.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Kontostand</div>
+      <div id="balances"><div class="no-data">Noch keine Ausgaben eingetragen.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Wer zahlt wem?</div>
+      <div id="settlements"><div class="no-data">Noch keine Ausgaben eingetragen.</div></div>
+    </div>
+    <button class="btn btn-ghost btn-full" onclick="switchTab('expenses')">← Zurück zu Ausgaben</button>
+  </div>
+</div>
+
+<script>
+let members = ['Franzi', 'Doro', 'Michi'];
+let piCount = 0;
+
+// splits only lists people who actually participate (share > 0)
+// participants array stores who was selected for this expense
+let expenses = (function() {
+  function split(total, participants) {
+    const share = total / participants.length;
+    const s = {};
+    participants.forEach(m => s[m] = share);
+    return s;
+  }
+  const all = ['Franzi','Doro','Michi'];
+  const df  = ['Franzi','Doro'];
+  return [
+    // Lidl Einkauf: Franzi 82, alle 3
+    {desc:'Lidl Einkauf',    total:82,   payer:'Franzi', participants:all, splits:split(82,   all), personalItems:[], groupTotal:82,   id:0},
+    // Apres Ski (lila): Franzi 58 + Doro 40 = 98, nur Doro+Franzi, zwei Einträge
+    {desc:'Apres Ski',       total:58,   payer:'Franzi', participants:df,  splits:split(58,   df),  personalItems:[], groupTotal:58,   id:1},
+    {desc:'Apres Ski',       total:40,   payer:'Doro',   participants:df,  splits:split(40,   df),  personalItems:[], groupTotal:40,   id:2},
+    // Frühstück: Franzi 20, Doro 15, alle 3
+    {desc:'Frühstück',       total:20,   payer:'Franzi', participants:all, splits:split(20,   all), personalItems:[], groupTotal:20,   id:3},
+    {desc:'Frühstück',       total:15,   payer:'Doro',   participants:all, splits:split(15,   all), personalItems:[], groupTotal:15,   id:4},
+    // Gamsmilch Runde 1: Franzi 25, Doro 25, alle 3
+    {desc:'Gamsmilch',       total:25,   payer:'Franzi', participants:all, splits:split(25,   all), personalItems:[], groupTotal:25,   id:5},
+    {desc:'Gamsmilch',       total:25,   payer:'Doro',   participants:all, splits:split(25,   all), personalItems:[], groupTotal:25,   id:6},
+    // Bier: Franzi 39, Michi 30, Doro 44, alle 3
+    {desc:'Bier',            total:39,   payer:'Franzi', participants:all, splits:split(39,   all), personalItems:[], groupTotal:39,   id:7},
+    {desc:'Bier',            total:30,   payer:'Michi',  participants:all, splits:split(30,   all), personalItems:[], groupTotal:30,   id:8},
+    {desc:'Bier',            total:44,   payer:'Doro',   participants:all, splits:split(44,   all), personalItems:[], groupTotal:44,   id:9},
+    // Abendessen: Michi 50, alle 3
+    {desc:'Abendessen',      total:50,   payer:'Michi',  participants:all, splits:split(50,   all), personalItems:[], groupTotal:50,   id:10},
+    // Gamsmilch Runde 2: Franzi 25, Michi 25, Doro 25, alle 3
+    {desc:'Gamsmilch',       total:25,   payer:'Franzi', participants:all, splits:split(25,   all), personalItems:[], groupTotal:25,   id:11},
+    {desc:'Gamsmilch',       total:25,   payer:'Michi',  participants:all, splits:split(25,   all), personalItems:[], groupTotal:25,   id:12},
+    {desc:'Gamsmilch',       total:25,   payer:'Doro',   participants:all, splits:split(25,   all), personalItems:[], groupTotal:25,   id:13},
+    // Mankei Alm: Franzi 48, alle 3
+    {desc:'Mankei Alm',      total:48,   payer:'Franzi', participants:all, splits:split(48,   all), personalItems:[], groupTotal:48,   id:14},
+    // Apres Ski (schwarz): Franzi 20, Michi 30, Doro 80, alle 3
+    {desc:'Apres Ski',       total:20,   payer:'Franzi', participants:all, splits:split(20,   all), personalItems:[], groupTotal:20,   id:15},
+    {desc:'Apres Ski',       total:30,   payer:'Michi',  participants:all, splits:split(30,   all), personalItems:[], groupTotal:30,   id:16},
+    {desc:'Apres Ski',       total:80,   payer:'Doro',   participants:all, splits:split(80,   all), personalItems:[], groupTotal:80,   id:17},
+    // Apres Ski (lila): Franzi 40, Doro 40, nur Doro+Franzi
+    {desc:'Apres Ski',       total:40,   payer:'Franzi', participants:df,  splits:split(40,   df),  personalItems:[], groupTotal:40,   id:18},
+    {desc:'Apres Ski',       total:40,   payer:'Doro',   participants:df,  splits:split(40,   df),  personalItems:[], groupTotal:40,   id:19},
+    // Tanken: nur Doro+Franzi
+    {desc:'Tanken Radstadt', total:65,   payer:'Doro',   participants:df,  splits:split(65,   df),  personalItems:[], groupTotal:65,   id:20},
+    {desc:'Tanken Obergeis', total:68,   payer:'Doro',   participants:df,  splits:split(68,   df),  personalItems:[], groupTotal:68,   id:21},
+    // Unterkunft: Doro 1873, alle 3
+    {desc:'Unterkunft',      total:1873, payer:'Doro',   participants:all, splits:split(1873, all), personalItems:[], groupTotal:1873, id:22},
+  ];
+})();
+
+function toggleTheme(){
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+}
+
+function renderMembers(){
+  const el = document.getElementById('member-list');
+  el.innerHTML = members.map((m,i) => `
+    <div class="member-row">
+      <input value="${m}" oninput="members[${i}]=this.value;refreshAll()" placeholder="Name">
+      ${members.length > 2 ? `<button class="btn btn-sm btn-danger" onclick="removeMember(${i})">–</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function addMember(){
+  if(members.length >= 8) return;
+  members.push('');
+  renderMembers();
+  refreshAll();
+}
+
+function removeMember(i){
+  members.splice(i,1);
+  renderMembers();
+  refreshAll();
+}
+
+function refreshAll(){
+  renderPayerSelect();
+  renderParticipantChips();
+  renderSplitOptions();
+  renderPersonalSelects();
+  renderExpenseList();
+  renderResult();
+}
+
+function renderPayerSelect(){
+  const sel = document.getElementById('exp-payer');
+  const cur = sel.value;
+  const ms = members.filter(m => m.trim());
+  sel.innerHTML = ms.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+}
+
+// Participant chips: opt-in, none selected by default (click to add)
+function renderParticipantChips(preselected){
+  const ms = members.filter(m => m.trim());
+  const container = document.getElementById('participant-chips');
+  // Default: all selected (for new expense form); pass [] to start empty
+  const selected = preselected !== undefined ? preselected : ms;
+  container.innerHTML = ms.map(m => {
+    const isSelected = selected.includes(m);
+    return `<label class="participant-chip${isSelected ? ' selected' : ''}" onclick="toggleParticipant(this)">
+      <input type="checkbox" value="${m}"${isSelected ? ' checked' : ''}>
+      ${m}
+    </label>`;
+  }).join('');
+  renderSplitOptions();
+}
+
+function toggleParticipant(labelEl){
+  const cb = labelEl.querySelector('input[type=checkbox]');
+  const chips = document.querySelectorAll('.participant-chip.selected');
+  if(cb.checked && chips.length <= 1) return; // keep at least 1
+  cb.checked = !cb.checked;
+  labelEl.classList.toggle('selected', cb.checked);
+  renderSplitOptions();
+  updateCalcHint();
+}
+
+function getSelectedParticipants(){
+  return Array.from(document.querySelectorAll('.participant-chip.selected input'))
+    .map(cb => cb.value);
+}
+
+function renderSplitOptions(){
+  const type = document.getElementById('exp-split-type').value;
+  const el = document.getElementById('split-options');
+  const participants = getSelectedParticipants();
+  if(type === 'equal'){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div style="margin-bottom:10px">
+    <div class="split-hint">Betrag pro Person (€) — nur beteiligte Personen:</div>
+    ${participants.map(m => `<div class="split-row"><label>${m}</label><input type="number" min="0" step="0.01" id="split-${CSS.escape(m)}" placeholder="0,00"></div>`).join('')}
+  </div>`;
+}
+
+function addPersonalItem(){
+  piCount++;
+  const id = piCount;
+  const ms = members.filter(m => m.trim());
+  const container = document.getElementById('personal-items');
+  const div = document.createElement('div');
+  div.id = `pi-${id}`;
+  div.className = 'pi-row';
+  div.innerHTML = `
+    <div><label>Person</label><select id="pi-who-${id}">${ms.map(m=>`<option>${m}</option>`).join('')}</select></div>
+    <div><label>Betrag (€)</label><input type="number" min="0" step="0.01" placeholder="0,00" id="pi-amt-${id}" oninput="updateCalcHint()"></div>
+    <div style="padding-bottom:0"><button class="btn btn-sm btn-danger" onclick="removePI(${id})" style="margin-top:20px">–</button></div>
+  `;
+  container.appendChild(div);
+}
+
+function removePI(id){
+  const el = document.getElementById(`pi-${id}`);
+  if(el) el.remove();
+  updateCalcHint();
+}
+
+function renderPersonalSelects(){
+  const ms = members.filter(m => m.trim());
+  document.querySelectorAll('[id^="pi-who-"]').forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = ms.map(m => `<option${m===cur?' selected':''}>${m}</option>`).join('');
+  });
+}
+
+function updateCalcHint(){
+  const total = parseFloat(document.getElementById('exp-total').value) || 0;
+  let pSum = 0;
+  document.querySelectorAll('[id^="pi-amt-"]').forEach(i => pSum += parseFloat(i.value)||0);
+  const el = document.getElementById('calc-hint');
+  const participants = getSelectedParticipants();
+  if(total > 0){
+    const group = total - pSum;
+    const perPerson = participants.length > 0 ? group / participants.length : 0;
+    let hint = '';
+    if(pSum > 0){
+      hint = `Gruppenanteil: €${group.toFixed(2)} (Gesamt ${total.toFixed(2)} – persönlich ${pSum.toFixed(2)})`;
+      if(participants.length > 0) hint += ` → €${perPerson.toFixed(2)} pro Person`;
+    } else if(participants.length > 0 && participants.length < members.filter(m=>m.trim()).length){
+      hint = `Nur ${participants.join(', ')} beteiligt → €${perPerson.toFixed(2)} pro Person`;
+    }
+    el.textContent = hint;
+    el.className = 'calc-hint' + (group < -0.001 ? ' warn' : '');
+  } else {
+    el.textContent = '';
+  }
+}
+
+function addExpense(){
+  const desc = document.getElementById('exp-desc').value.trim();
+  const total = parseFloat(document.getElementById('exp-total').value);
+  const payer = document.getElementById('exp-payer').value;
+  const splitType = document.getElementById('exp-split-type').value;
+  const participants = getSelectedParticipants();
+
+  if(!desc || !total || total <= 0 || !payer){
+    alert('Bitte Beschreibung, Betrag und Bezahler angeben.');
+    return;
+  }
+  if(participants.length === 0){
+    alert('Bitte mindestens eine Person auswählen.');
+    return;
+  }
+
+  let personalItems = [];
+  let personalSum = 0;
+  document.querySelectorAll('[id^="pi-who-"]').forEach(el => {
+    const id = el.id.replace('pi-who-','');
+    const who = el.value;
+    const amt = parseFloat(document.getElementById(`pi-amt-${id}`)?.value) || 0;
+    if(amt > 0){ personalItems.push({who, amt}); personalSum += amt; }
+  });
+
+  const groupTotal = total - personalSum;
+  if(groupTotal < -0.001){ alert('Persönliche Anteile übersteigen den Gesamtbetrag.'); return; }
+
+  let splits = {};
+
+  if(splitType === 'equal'){
+    const share = groupTotal / participants.length;
+    participants.forEach(m => splits[m] = share);
+  } else {
+    let customSum = 0;
+    participants.forEach(m => {
+      const v = parseFloat(document.getElementById(`split-${CSS.escape(m)}`)?.value) || 0;
+      splits[m] = v; customSum += v;
+    });
+    if(Math.abs(customSum - groupTotal) > 0.02){
+      alert(`Die eingetragenen Anteile (€${customSum.toFixed(2)}) stimmen nicht mit dem Gruppenanteil (€${groupTotal.toFixed(2)}) überein.`);
+      return;
+    }
+  }
+
+  expenses.push({desc, total, payer, participants, splits, personalItems, groupTotal, id: Date.now()});
+
+  document.getElementById('exp-desc').value = '';
+  document.getElementById('exp-total').value = '';
+  document.getElementById('exp-split-type').value = 'equal';
+  document.getElementById('split-options').innerHTML = '';
+  document.getElementById('personal-items').innerHTML = '';
+  piCount = 0;
+  document.getElementById('calc-hint').textContent = '';
+  // reset chips to all selected
+  renderParticipantChips(members.filter(m => m.trim()));
+
+  renderExpenseList();
+  renderResult();
+}
+
+function removeExpense(id){
+  expenses = expenses.filter(e => e.id !== id);
+  renderExpenseList();
+  renderResult();
+}
+
+function renderExpenseList(){
+  const el = document.getElementById('expense-list');
+  if(!expenses.length){
+    el.innerHTML = '<div class="no-data">Noch keine Ausgaben.</div>';
+    document.getElementById('expense-totals').innerHTML = '';
+    return;
+  }
+
+  const allMembers = members.filter(m => m.trim());
+
+  el.innerHTML = expenses.map(e => {
+    const splits = Object.entries(e.splits).filter(([,v]) => v > 0.001)
+      .map(([k,v]) => `${k} €${v.toFixed(2)}`).join(' · ');
+    const personal = e.personalItems.length
+      ? `<div class="expense-meta" style="margin-top:3px">${e.personalItems.map(p=>`${p.who}: €${p.amt.toFixed(2)} persönlich`).join(' · ')}</div>`
+      : '';
+    const participants = e.participants || allMembers;
+    const isPartial = participants.length < allMembers.length;
+    const participantsTag = isPartial
+      ? `<span class="participants-tag">nur ${participants.join(', ')}</span>`
+      : '';
+    return `<div class="expense-item">
+      <div class="expense-row">
+        <span class="expense-name">${e.desc}</span>
+        <span class="expense-amount">€${e.total.toFixed(2)}</span>
+      </div>
+      <div class="expense-meta">Bezahlt von ${e.payer} ${participantsTag}</div>
+      <div class="expense-meta">Aufteilung: ${splits}</div>
+      ${personal}
+      <button class="btn btn-sm btn-danger" onclick="removeExpense(${e.id})" style="margin-top:7px">Entfernen</button>
+    </div>`;
+  }).join('');
+
+  const grandTotal = expenses.reduce((s,e) => s+e.total, 0);
+  document.getElementById('expense-totals').innerHTML = `
+    <div class="totals-row">
+      <span>${expenses.length} Ausgabe${expenses.length!==1?'n':''}</span>
+      <span>Gesamt: €${grandTotal.toFixed(2)}</span>
+    </div>`;
+}
+
+function renderResult(){
+  const ms = members.filter(m => m.trim());
+  if(!ms.length || !expenses.length){
+    document.getElementById('person-summary').innerHTML = '<div class="no-data">Noch keine Ausgaben eingetragen.</div>';
+    document.getElementById('balances').innerHTML = '<div class="no-data">Noch keine Ausgaben eingetragen.</div>';
+    document.getElementById('settlements').innerHTML = '';
+    return;
+  }
+
+  let paid = {}, owed = {};
+  ms.forEach(m => { paid[m] = 0; owed[m] = 0; });
+
+  expenses.forEach(e => {
+    if(paid[e.payer] !== undefined) paid[e.payer] += e.total;
+    Object.entries(e.splits).forEach(([m, share]) => {
+      if(owed[m] !== undefined) owed[m] += share;
+    });
+    e.personalItems.forEach(p => {
+      if(owed[p.who] !== undefined) owed[p.who] += p.amt;
+    });
+  });
+
+  const grandTotal = expenses.reduce((s,e) => s+e.total, 0);
+
+  const summaryEl = document.getElementById('person-summary');
+  summaryEl.innerHTML = `
+    <table style="width:100%;font-size:13px;border-collapse:collapse">
+      <thead>
+        <tr style="color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">
+          <th style="text-align:left;padding:0 0 10px;font-weight:500">Person</th>
+          <th style="text-align:right;padding:0 0 10px;font-weight:500">Bezahlt</th>
+          <th style="text-align:right;padding:0 0 10px;font-weight:500">Anteil</th>
+          <th style="text-align:right;padding:0 0 10px;font-weight:500">Bilanz</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${ms.map(m => {
+          const b = paid[m] - owed[m];
+          const cls = b > 0.005 ? 'pos' : b < -0.005 ? 'neg' : 'zero';
+          const sign = b > 0.005 ? '+' : '';
+          return `<tr style="border-top:0.5px solid var(--border)">
+            <td style="padding:9px 0;font-weight:500">${m}</td>
+            <td style="padding:9px 0;text-align:right;font-variant-numeric:tabular-nums">€${paid[m].toFixed(2)}</td>
+            <td style="padding:9px 0;text-align:right;color:var(--text2);font-variant-numeric:tabular-nums">€${owed[m].toFixed(2)}</td>
+            <td style="padding:9px 0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums" class="${cls}">${sign}€${Math.abs(b).toFixed(2)}</td>
+          </tr>`;
+        }).join('')}
+        <tr style="border-top:1px solid var(--border-strong)">
+          <td style="padding:8px 0;font-size:12px;color:var(--text2)">Gesamt</td>
+          <td style="padding:8px 0;text-align:right;font-size:12px;color:var(--text2);font-variant-numeric:tabular-nums">€${grandTotal.toFixed(2)}</td>
+          <td style="padding:8px 0;text-align:right;font-size:12px;color:var(--text2);font-variant-numeric:tabular-nums">€${Object.values(owed).reduce((a,b)=>a+b,0).toFixed(2)}</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>`;
+
+  let balance = {};
+  ms.forEach(m => balance[m] = paid[m] - owed[m]);
+
+  document.getElementById('balances').innerHTML = ms.map(m => {
+    const b = balance[m];
+    const cls = b > 0.005 ? 'pos' : b < -0.005 ? 'neg' : 'zero';
+    const sign = b > 0.005 ? '+' : '';
+    const badge = b > 0.005
+      ? `<span class="badge badge-green">bekommt zurück</span>`
+      : b < -0.005
+      ? `<span class="badge badge-red">schuldet noch</span>`
+      : `<span class="badge badge-neutral">quitt</span>`;
+    return `<div class="balance-row">
+      <div style="display:flex;align-items:center;gap:8px"><span>${m}</span>${badge}</div>
+      <span class="balance-amount ${cls}">${sign}€${Math.abs(b).toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  const creditors = ms.filter(m => balance[m] > 0.005).sort((a,b) => balance[b]-balance[a]);
+  const debtors = ms.filter(m => balance[m] < -0.005).sort((a,b) => balance[a]-balance[b]);
+
+  let cred = creditors.map(m => ({m, b: balance[m]}));
+  let debt = debtors.map(m => ({m, b: Math.abs(balance[m])}));
+  let transfers = [];
+  let ci=0, di=0;
+  while(ci < cred.length && di < debt.length){
+    const amt = Math.min(cred[ci].b, debt[di].b);
+    if(amt > 0.01) transfers.push({from: debt[di].m, to: cred[ci].m, amt});
+    cred[ci].b -= amt; debt[di].b -= amt;
+    if(cred[ci].b < 0.01) ci++;
+    if(debt[di].b < 0.01) di++;
+  }
+
+  const setEl = document.getElementById('settlements');
+  if(!transfers.length){
+    setEl.innerHTML = '<div class="no-data">Alle quitt.</div>';
+    return;
+  }
+  setEl.innerHTML = transfers.map(t => `
+    <div class="settlement-row">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div class="settlement-names">
+          <span style="font-weight:600">${t.from}</span>
+          <span class="arrow">→</span>
+          <span style="font-weight:600">${t.to}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2)">${t.from} schuldet ${t.to}</div>
+      </div>
+      <span class="settlement-amount">€${t.amt.toFixed(2)}</span>
+    </div>
+  `).join('');
+}
+
+function printPDF(){
+  // Show all panels temporarily for print
+  document.querySelectorAll('.panel').forEach(p => p.style.display = 'block');
+  window.print();
+  // Restore after print dialog closes
+  setTimeout(() => {
+    document.querySelectorAll('.panel').forEach(p => p.style.display = '');
+    // Re-activate the current active panel
+    document.querySelector('.panel.active').style.display = 'block';
+  }, 500);
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['members','expenses','result'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  if(name === 'expenses'){
+    renderPayerSelect();
+    renderParticipantChips();
+  }
+  if(name === 'result') renderResult();
+}
+
+renderMembers();
+renderPayerSelect();
+renderParticipantChips();
+renderExpenseList();
+renderResult();
+</script>
+</body>
+</html>
